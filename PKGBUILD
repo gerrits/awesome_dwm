@@ -1,4 +1,3 @@
-
 pkgname=awesome_dwm
 pkgver=5.9
 pkgrel=2
