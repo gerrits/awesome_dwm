@@ -1,9 +1,8 @@
-
 pkgname=awesome_dwm
 pkgver=5.9
 pkgrel=2
 pkgdesc="A dynamic window manager for X + patches"
-url=""
+url="https://hithub.com/gerrits/awesome_dwm"
 arch=('i686' 'x86_64')
 license=('MIT')
 options=(zipman)
