@@ -219,6 +219,8 @@ static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
+static void movetoprev(void); //move client to prev tag
+static void movetonext(void); //move client to next tag
 static void tagmon(const Arg *arg);
 static int textnw(const char *text, unsigned int len);
 static void tile(Monitor *);
@@ -444,7 +446,8 @@ buttonpress(XEvent *e) {
 		}
 		else if(ev->x < x + blw)
 			click = ClkLtSymbol;
-		else if(ev->x > selmon->ww - TEXTW(stext))
+		
+else if(ev->x > selmon->ww - TEXTW(stext))
 			click = ClkStatusText;
 		else
 			click = ClkWinTitle;
@@ -1622,6 +1625,29 @@ tag(const Arg *arg) {
 		arrange(selmon);
 	}
 }
+/*movetoprev and movetonext functions*/
+void
+movetoprev(void) {
+        if ( !selmon->sel && selmon->tagset[selmon->seltags] & (unsigned int) 1 )
+        return;
+
+    selmon->sel->tags = selmon->tagset[selmon->seltags] >> 1;
+    selmon->tagset[selmon->seltags] = selmon->tagset[selmon->seltags] >> 1;
+    arrange(selmon);
+
+}
+
+void
+movetonext(void) {
+        if (!selmon->sel && selmon->tagset[selmon->seltags] & ((unsigned int) 1 <<  (LENGTH(tags)-1)))
+        return;
+
+    selmon->sel->tags = selmon->tagset[selmon->seltags] << 1;
+    selmon->tagset[selmon->seltags] = selmon->tagset[selmon->seltags] << 1;
+    arrange(selmon);
+
+}
+
 
 void
 tagmon(const Arg *arg) {
