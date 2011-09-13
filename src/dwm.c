@@ -2006,9 +2006,10 @@ view(const Arg *arg) {
 void
 viewprev(void) {
     unsigned int new_tagset = selmon->tagset[selmon->seltags];
-    if ( new_tagset  & (unsigned int) 1 )
+    if ( new_tagset  & (unsigned int) 1 ) {
         new_tagset ^= (unsigned int) 1;
         new_tagset |= ((unsigned int) 1 << (LENGTH(tags) -1));
+    }
     else
         new_tagset = new_tagset >> 1;
 
@@ -2019,9 +2020,10 @@ viewprev(void) {
 void
 viewnext(void) {
     unsigned int new_tagset = selmon->tagset[selmon->seltags];
-    if ( new_tagset & ((unsigned int) 1 << (LENGTH(tags) -1)))
+    if ( new_tagset & ((unsigned int) 1 << (LENGTH(tags) -1))) {
         new_tagset ^= ((unsigned int) 1 << (LENGTH(tags) -1));
         new_tagset |= (unsigned int) 1;
+    }
     else
         new_tagset = new_tagset << 1;
 
