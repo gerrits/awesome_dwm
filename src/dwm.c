@@ -2005,19 +2005,27 @@ view(const Arg *arg) {
 
 void
 viewprev(void) {
-    if ( selmon->tagset[selmon->seltags] & (unsigned int) 1 )
-        selmon->tagset[selmon->seltags] = ((unsigned int) 1 << (LENGTH(tags) -1));
+    unsigned int new_tagset = selmon->tagset[selmon->seltags];
+    if ( new_tagset  & (unsigned int) 1 )
+        new_tagset ^= (unsigned int) 1;
+        new_tagset |= ((unsigned int) 1 << (LENGTH(tags) -1));
     else
-        selmon->tagset[selmon->seltags] = selmon->tagset[selmon->seltags] >> 1;
+        new_tagset = new_tagset >> 1;
+
+    selmon->tagset[selmon->seltags] = new_tagset;
     arrange(selmon);
 }
                             
 void
 viewnext(void) {
-    if ( selmon->tagset[selmon->seltags] & ((unsigned int) 1 << (LENGTH(tags) -1)))
-        selmon->tagset[selmon->seltags] = (unsigned int) 1;
+    unsigned int new_tagset = selmon->tagset[selmon->seltags];
+    if ( new_tagset & ((unsigned int) 1 << (LENGTH(tags) -1)))
+        new_tagset ^= ((unsigned int) 1 << (LENGTH(tags) -1));
+        new_tagset |= (unsigned int) 1;
     else
-        selmon->tagset[selmon->seltags] = selmon->tagset[selmon->seltags] << 1;
+        new_tagset = new_tagset << 1;
+
+    selmon->tagset[selmon->seltags] = new_tagset;
     arrange(selmon);
 }
 
