@@ -1,0 +1,94 @@
+diff -up dwm.orig/config.def.h dwm-6.0/config.def.h
+--- dwm.orig/config.def.h	2015-01-10 14:31:28.531025891 +0100
++++ dwm-6.0/config.def.h	2015-01-10 14:35:31.141381725 +0100
+@@ -74,6 +74,10 @@ static Key keys[] = {
+ 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
+ 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
+ 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
++        { MODKEY,                       XK_Left,   viewprev,       {0} },
++        { MODKEY,                       XK_Right,  viewnext,       {0} },
++        { MODKEY|ShiftMask,             XK_Left,   movetoprev,     {0} },
++        { MODKEY|ShiftMask,             XK_Right,  movetonext,     {0} },
+ 	TAGKEYS(                        XK_1,                      0)
+ 	TAGKEYS(                        XK_2,                      1)
+ 	TAGKEYS(                        XK_3,                      2)
+diff -up dwm.orig/dwm.c dwm-6.0/dwm.c
+--- dwm.orig/dwm.c	2015-01-10 14:31:28.531025891 +0100
++++ dwm-6.0/dwm.c	2015-01-10 14:40:14.461797268 +0100
+@@ -252,6 +252,11 @@ static int xerrordummy(Display *dpy, XEr
+ static int xerrorstart(Display *dpy, XErrorEvent *ee);
+ static void zoom(const Arg *arg);
+ 
++static void viewnext(const Arg *arg);
++static void viewprev(const Arg *arg);
++static void movetoprev(const Arg *arg); //move client to prev tag
++static void movetonext(const Arg *arg); //move client to next tag
++
+ /* variables */
+ static const char broken[] = "broken";
+ static char stext[256];
+@@ -2144,3 +2149,64 @@ main(int argc, char *argv[]) {
+ 	XCloseDisplay(dpy);
+ 	return EXIT_SUCCESS;
+ }
++
++void viewprev(const Arg *arg) {
++        unsigned int new_tagset = selmon->tagset[selmon->seltags];
++        if ( new_tagset & (unsigned int) 1 ) {
++                new_tagset ^= (unsigned int) 1;
++                new_tagset = new_tagset >> 1;
++                new_tagset |= ((unsigned int) 1 << (LENGTH(tags)-1));
++        } else {
++                new_tagset = new_tagset >> 1;
++        }
++
++        Arg a = {.ui = new_tagset};
++        view(&a);
++}
++
++void viewnext(const Arg *arg) {
++        unsigned int new_tagset = selmon->tagset[selmon->seltags];
++        if ( new_tagset & ((unsigned int) 1 << (LENGTH(tags) -1))) {
++                new_tagset ^= ((unsigned int) 1 << (LENGTH(tags) -1));
++                new_tagset = new_tagset << 1;
++                new_tagset |= (unsigned int) 1;
++        } else {
++                new_tagset = new_tagset << 1;
++        }
++
++        Arg a = {.ui = new_tagset};
++        view(&a);
++}
++
++
++/*movetoprev and movetonext functions*/
++void movetoprev(const Arg *arg) {
++        if (!selmon->sel)
++                return;
++
++        if ( selmon->tagset[selmon->seltags] & (unsigned int) 1 ) {
++                selmon->sel->tags = ((unsigned int) 1 << (LENGTH(tags) - 1));
++        }
++        else {
++                selmon->sel->tags = (selmon->sel->tags >> 1);
++        }
++
++        Arg a = {0};
++        viewprev(&a);
++}
++
++void movetonext(const Arg *arg) {
++        if (!selmon->sel)
++                return;
++
++        if (selmon->tagset[selmon->seltags] & ((unsigned int) 1 << (LENGTH(tags) - 1))) {
++                selmon->sel->tags = (unsigned int) 1;
++        }
++        else {
++                selmon->sel->tags = selmon->sel->tags << 1;
++        }
++
++        Arg a = {0};
++        viewnext(&a);
++}
++
